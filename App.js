@@ -1,11 +1,18 @@
-import { StatusBar } from 'expo-status-bar';
+import 'react-native-gesture-handler';
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+// Navigation
+import Navigator from './navigation/Navigator';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
 
 
+// Screens
+import CreateStepOne from './screens/CreateStepOne';
+import CreateStepTwo from './screens/CreateStepTwo';
 
 // FIREBASE SDK CONFIG
 import { initializeApp } from "firebase/app";
+
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -23,21 +30,19 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 
 
+// Stack navigator
+const Stack = createStackNavigator();
+
 
 export default function App() {
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <NavigationContainer >
+      <Stack.Navigator initialRouteName="Navigator" >
+        <Stack.Screen name="Navigator" component={Navigator} options={{headerShown: false}} />
+        <Stack.Screen name="Post" component={CreateStepOne} />
+        <Stack.Screen name="Save" component={CreateStepTwo} />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
