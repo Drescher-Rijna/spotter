@@ -1,7 +1,6 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react'
-import { View, Text } from 'react-native'
 import Home from '../screens/Home';
 import Profile from '../screens/Profile';
 
