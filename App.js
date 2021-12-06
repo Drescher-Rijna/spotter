@@ -7,8 +7,8 @@ import { createStackNavigator } from '@react-navigation/stack';
 
 
 // Screens
-import CreateStepOne from './screens/CreateStepOne';
 import CreateStepTwo from './screens/CreateStepTwo';
+import CreateStepOne from './screens/CreateStepOne';
 
 // FIREBASE SDK CONFIG
 import { initializeApp } from "firebase/app";
@@ -40,7 +40,7 @@ export default function App() {
       <Stack.Navigator initialRouteName="Navigator" >
         <Stack.Screen name="Navigator" component={Navigator} options={{headerShown: false}} />
         <Stack.Screen name="Post" component={CreateStepOne} />
-        <Stack.Screen name="Save" component={CreateStepTwo} />
+        <Stack.Screen name="Submit" component={CreateStepTwo} />
       </Stack.Navigator>
     </NavigationContainer>
   );
