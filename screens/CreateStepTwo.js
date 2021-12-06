@@ -1,7 +1,6 @@
 import { Formik } from 'formik'
 import React, { useEffect, useState } from 'react'
-import { Button, Dimensions, Image, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import { TextInput } from 'react-native-gesture-handler'
+import { Button, Dimensions, Image, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import * as Location from 'expo-location';
 import { RadioButton } from 'react-native-paper';
 import MapView, { Marker } from 'react-native-maps';
@@ -10,8 +9,13 @@ import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplet
 export default function CreateStepTwo(props) {
     const [location, setLocation] = useState(null);
     const [address, setAddress] = useState(null);
-    const [errorMsg, setErrorMsg] = useState(null);
     const [coordinates, setCoordinates] = useState({latitude: 0, longitude: 0});
+
+    //Form fields state
+    const [titleInput, setTitleInput] = useState('');
+    const [descriptionInput, setDescriptionInput] = useState('');
+    const [locationInput, setLocationInput] = useState('');
+    const [categoryInput, setCategoryInput] = useState('');
 
     // Modal state
     const [modalOpen, setModalOpen] = useState(false);
@@ -26,8 +30,7 @@ export default function CreateStepTwo(props) {
 
             // GETTING LOCATION IF GRANTED
             let location = await Location.getCurrentPositionAsync({});
-            console.log('coords');
-            console.log(location.coords.longitudeDelta);
+        
             
             
             // USING COORDINATES TO GET ADDRESS DATA
@@ -41,31 +44,23 @@ export default function CreateStepTwo(props) {
                 
                 // SET THE ADDRESS TO A STATE
                 setAddress(resultAddress);
+                setLocationInput(resultAddress)
             }
 
             setCoordinates({latitude: location.coords.latitude, longitude: location.coords.longitude});
-            console.log('2');
-            console.log(coordinates);
         
     }, []);
+    
 
-    let userLocation = 'Waiting..';
-    if (errorMsg) {
-        userLocation = errorMsg;
-    } else if (address) {
-        userLocation = address;
+    // submittion function
+    const handleSubmit = () => {
+        console.log('submitted')
+        console.log(titleInput);
+        console.log('description')
+        console.log(descriptionInput);
+        console.log(locationInput);
+        console.log(categoryInput);
     }
-    useEffect(() => {
-        
-        if (errorMsg) {
-            userLocation = errorMsg;
-        } else if (address) {
-            userLocation = address;
-            console.log(userLocation);
-        }
-    }, [address])
-
-    // USING STATE ON VARIABLE WITH IF CHECK
     
 
     return (
@@ -74,34 +69,23 @@ export default function CreateStepTwo(props) {
             <Image style={styles.imagePrev} source={{ uri: props.route.params.image }} />
             
             {/* FORM WITH LOCATION INFO */}
-            <Formik
-                enableReinitialize={true}
-                initialValues={{ title: '', location: userLocation, category: '', body: '',  }}
-                onSubmit={(values) => {
-                    console.log(values.location);
-                    console.log(props.route.params.image);
-                    console.log(values.category);
-                    console.log(values.title);
-                    console.log(values.body);
-                }}
-            >
-                {(props) => (
+            
                     <ScrollView style={styles.formCon}>
                         {/* TITLE */}
                         <Text style={styles.label} >Spot name & description</Text>
                         <TextInput 
                             style={styles.inputFields}
                             placeholder='Spot name'
-                            onChangeText={props.handleChange('title')}
-                            value={props.values.title}
+                            value={titleInput}
+                            onChangeText={val => {setTitleInput(val); console.log(val);}}
                         />
 
                         {/* DESCRIPTION */}
-                        <TextInput 
+                        <TextInput
                             style={styles.textArea}
                             placeholder='Describe the spot...'
-                            onChangeText={props.handleChange('body')}
-                            value={props.values.body}
+                            value={descriptionInput}
+                            onChangeText={val => {setDescriptionInput(val); console.log(val);}}
                         />
 
                         {/* LOCATION */}
@@ -111,9 +95,8 @@ export default function CreateStepTwo(props) {
                                 <TextInput 
                                     style={{flex: 0.7}}
                                     placeholder='Location'
-                                    onChangeText={props.handleChange('location')}
-                                    value={props.values.location}
-                                    
+                                    value={locationInput}
+                                    editable={false}
                                 />
                                 <TouchableOpacity style={{backgroundColor: 'red', flex: 0.3}} onPress={() => {setModalOpen(!modalOpen)}}>
                                     <Text style={{textAlign: 'center', fontWeight: 'bold', color: 'white', textAlignVertical: 'center'}} >New location</Text>
@@ -125,7 +108,7 @@ export default function CreateStepTwo(props) {
                         {/* CATEGORY */}
                         <Text style={styles.label} >Category</Text>
                         <View style={styles.categoryInput}>
-                            <RadioButton.Group value={props.values.category} onValueChange={props.handleChange('category')}>
+                            <RadioButton.Group value={categoryInput} onValueChange={(val) => {setCategoryInput(val)}}>
                                 <View style={{flexDirection: 'row', justifyContent: 'space-around' }}>
                                     <View style={{flexDirection: 'row', alignItems: 'center'}} >
                                         <Text>Park</Text>
@@ -143,14 +126,12 @@ export default function CreateStepTwo(props) {
                             </RadioButton.Group>
                         </View>
                         
-                        <TouchableOpacity style={styles.submitBtn} onPress={props.handleSubmit}>
+                        <TouchableOpacity style={styles.submitBtn} onPress={handleSubmit} >
                             <Text style={styles.submitText}>
                                 Post
                             </Text>
                         </TouchableOpacity>
                     </ScrollView>
-                )}
-            </Formik>
                 
             {/* Modal for typing in a new location other than the users current location */}
             <Modal visible={modalOpen} >
@@ -173,7 +154,7 @@ export default function CreateStepTwo(props) {
                             key: "AIzaSyC98flPHNxCKCi2Sq3oxKJ4kVdeApkwR3c",
                             language: "da",
                             components: "country:dk",
-                            location: userLocation
+                            location: address
                         }}
                         styles={{
                             container: { flex: 0, position: "absolute", width: "100%", zIndex: 5, borderRadius: 0 },
@@ -186,8 +167,17 @@ export default function CreateStepTwo(props) {
                         {/* Make it so when they press the new coords are made to a address and make choosenLocation into that */}
                         <Button title="Confirm location" onPress={async() => {
                                 let result = await Location.reverseGeocodeAsync({latitude: coordinates.latitude, longitude: coordinates.longitude});
-                                setAddress(result);
+                                console.log(result)
+
+                                for (let item of result) {
+                                    let resultLocation = `${item.street} ${item.name}, ${item.postalCode} ${item.city}`;
+                                    
+                                    setLocationInput(resultLocation);
+                                }
+                                
+                                
                                 setModalOpen(!modalOpen);
+                                console.log('loc ' + locationInput)
                             }} 
                         />
                     </View>
