@@ -7,9 +7,9 @@ import { RadioButton } from 'react-native-paper';
 import MapView, { Marker } from 'react-native-maps';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 // Firebase storage and firestore
-import { firestore, storage } from '../App';
+import { firestore, storage } from '../Firebase';
 import { getDownloadURL, ref, uploadBytesResumable } from '@firebase/storage';
-import { addDoc, collection } from '@firebase/firestore';
+import { addDoc, collection, Timestamp } from '@firebase/firestore';
 
 
 export default function CreateStepTwo(props) {
@@ -22,7 +22,6 @@ export default function CreateStepTwo(props) {
     const [descriptionInput, setDescriptionInput] = useState('');
     const [locationInput, setLocationInput] = useState('');
     const [categoryInput, setCategoryInput] = useState('');
-    const [imageURL, setImageURL] = useState('');
 
     // Modal state
     const [modalOpen, setModalOpen] = useState(false);
@@ -106,7 +105,8 @@ export default function CreateStepTwo(props) {
                             description: descriptionInput,
                             category: categoryInput,
                             location: locationInput,
-                            image: url
+                            image: url,
+                            uploadTime: Timestamp.now(),
                         }
 
                         try {
