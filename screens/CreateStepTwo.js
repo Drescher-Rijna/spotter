@@ -1,17 +1,28 @@
 import { Formik } from 'formik'
 import React, { useEffect, useState } from 'react'
-import { Button, Dimensions, Image, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import { TextInput } from 'react-native-gesture-handler'
+import { Button, Dimensions, Image, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import * as Location from 'expo-location';
 import { RadioButton } from 'react-native-paper';
+// mapview and google maps
 import MapView, { Marker } from 'react-native-maps';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
+// Firebase storage and firestore
+import { firestore, storage } from '../App';
+import { getDownloadURL, ref, uploadBytesResumable } from '@firebase/storage';
+import { addDoc, collection } from '@firebase/firestore';
+
 
 export default function CreateStepTwo(props) {
-    const [location, setLocation] = useState(null);
+    // Location states
     const [address, setAddress] = useState(null);
-    const [errorMsg, setErrorMsg] = useState(null);
     const [coordinates, setCoordinates] = useState({latitude: 0, longitude: 0});
+
+    //Form fields state
+    const [titleInput, setTitleInput] = useState('');
+    const [descriptionInput, setDescriptionInput] = useState('');
+    const [locationInput, setLocationInput] = useState('');
+    const [categoryInput, setCategoryInput] = useState('');
+    const [imageURL, setImageURL] = useState('');
 
     // Modal state
     const [modalOpen, setModalOpen] = useState(false);
@@ -26,13 +37,11 @@ export default function CreateStepTwo(props) {
 
             // GETTING LOCATION IF GRANTED
             let location = await Location.getCurrentPositionAsync({});
-            console.log('coords');
-            console.log(location.coords.longitudeDelta);
+        
             
             
             // USING COORDINATES TO GET ADDRESS DATA
             let response = await Location.reverseGeocodeAsync({ latitude: location.coords.latitude, longitude: location.coords.longitude });
-            setLocation(response);
             
 
             // LOOP THROUGH ADRESS DATA TO WRITE IT OUT IN SPECIFIC WAY
@@ -41,31 +50,63 @@ export default function CreateStepTwo(props) {
                 
                 // SET THE ADDRESS TO A STATE
                 setAddress(resultAddress);
+                setLocationInput(resultAddress)
             }
 
             setCoordinates({latitude: location.coords.latitude, longitude: location.coords.longitude});
-            console.log('2');
-            console.log(coordinates);
         
     }, []);
+    
 
-    let userLocation = 'Waiting..';
-    if (errorMsg) {
-        userLocation = errorMsg;
-    } else if (address) {
-        userLocation = address;
-    }
-    useEffect(() => {
-        
-        if (errorMsg) {
-            userLocation = errorMsg;
-        } else if (address) {
-            userLocation = address;
-            console.log(userLocation);
+    // submittion function
+    const handleSubmit = async () => {
+        // File path and name for storage and firestore
+        const uploadUri = props.route.params.image;
+        console.log(uploadUri)
+        let filename = uploadUri.substring(uploadUri.lastIndexOf('/') + 1);
+
+        // upload to storage
+        const storageRef = ref(storage, `/${filename}`);
+        const uploadTask = uploadBytesResumable(storageRef, uploadUri);
+
+        try {
+            uploadTask.on(
+                "state_changed", 
+                (snapshot) => {
+                const progress = Math.round((snapshot.bytesTransferred / snapshot.totalBytes ) * 100);
+                // progress state
+                },
+                (err) => console.log(err),
+                async () => {
+                    await getDownloadURL(uploadTask.snapshot.ref).
+                    then(url => {
+                        setImageURL(url);
+                    });
+                }
+            );
+        } catch (e) {
+            console.log(e);
         }
-    }, [address])
+        
 
-    // USING STATE ON VARIABLE WITH IF CHECK
+        // write to firestore
+        const dbRef = collection(firestore, 'posts');
+        const postData = {
+            title: titleInput,
+            description: descriptionInput,
+            category: categoryInput,
+            location: locationInput,
+            image: imageURL
+        }
+
+        try {
+            await addDoc(dbRef, postData);
+        } catch (e) {
+            console.log(e);
+        }
+        
+
+    }
     
 
     return (
@@ -74,34 +115,23 @@ export default function CreateStepTwo(props) {
             <Image style={styles.imagePrev} source={{ uri: props.route.params.image }} />
             
             {/* FORM WITH LOCATION INFO */}
-            <Formik
-                enableReinitialize={true}
-                initialValues={{ title: '', location: userLocation, category: '', body: '',  }}
-                onSubmit={(values) => {
-                    console.log(values.location);
-                    console.log(props.route.params.image);
-                    console.log(values.category);
-                    console.log(values.title);
-                    console.log(values.body);
-                }}
-            >
-                {(props) => (
+            
                     <ScrollView style={styles.formCon}>
                         {/* TITLE */}
                         <Text style={styles.label} >Spot name & description</Text>
                         <TextInput 
                             style={styles.inputFields}
                             placeholder='Spot name'
-                            onChangeText={props.handleChange('title')}
-                            value={props.values.title}
+                            value={titleInput}
+                            onChangeText={val => {setTitleInput(val); console.log(val);}}
                         />
 
                         {/* DESCRIPTION */}
-                        <TextInput 
+                        <TextInput
                             style={styles.textArea}
                             placeholder='Describe the spot...'
-                            onChangeText={props.handleChange('body')}
-                            value={props.values.body}
+                            value={descriptionInput}
+                            onChangeText={val => {setDescriptionInput(val); console.log(val);}}
                         />
 
                         {/* LOCATION */}
@@ -111,9 +141,8 @@ export default function CreateStepTwo(props) {
                                 <TextInput 
                                     style={{flex: 0.7}}
                                     placeholder='Location'
-                                    onChangeText={props.handleChange('location')}
-                                    value={props.values.location}
-                                    
+                                    value={locationInput}
+                                    editable={false}
                                 />
                                 <TouchableOpacity style={{backgroundColor: 'red', flex: 0.3}} onPress={() => {setModalOpen(!modalOpen)}}>
                                     <Text style={{textAlign: 'center', fontWeight: 'bold', color: 'white', textAlignVertical: 'center'}} >New location</Text>
@@ -125,7 +154,7 @@ export default function CreateStepTwo(props) {
                         {/* CATEGORY */}
                         <Text style={styles.label} >Category</Text>
                         <View style={styles.categoryInput}>
-                            <RadioButton.Group value={props.values.category} onValueChange={props.handleChange('category')}>
+                            <RadioButton.Group value={categoryInput} onValueChange={(val) => {setCategoryInput(val)}}>
                                 <View style={{flexDirection: 'row', justifyContent: 'space-around' }}>
                                     <View style={{flexDirection: 'row', alignItems: 'center'}} >
                                         <Text>Park</Text>
@@ -143,14 +172,12 @@ export default function CreateStepTwo(props) {
                             </RadioButton.Group>
                         </View>
                         
-                        <TouchableOpacity style={styles.submitBtn} onPress={props.handleSubmit}>
+                        <TouchableOpacity style={styles.submitBtn} onPress={handleSubmit} >
                             <Text style={styles.submitText}>
                                 Post
                             </Text>
                         </TouchableOpacity>
                     </ScrollView>
-                )}
-            </Formik>
                 
             {/* Modal for typing in a new location other than the users current location */}
             <Modal visible={modalOpen} >
@@ -173,7 +200,7 @@ export default function CreateStepTwo(props) {
                             key: "AIzaSyC98flPHNxCKCi2Sq3oxKJ4kVdeApkwR3c",
                             language: "da",
                             components: "country:dk",
-                            location: userLocation
+                            location: address
                         }}
                         styles={{
                             container: { flex: 0, position: "absolute", width: "100%", zIndex: 5, borderRadius: 0 },
@@ -186,8 +213,17 @@ export default function CreateStepTwo(props) {
                         {/* Make it so when they press the new coords are made to a address and make choosenLocation into that */}
                         <Button title="Confirm location" onPress={async() => {
                                 let result = await Location.reverseGeocodeAsync({latitude: coordinates.latitude, longitude: coordinates.longitude});
-                                setAddress(result);
+                                console.log(result)
+
+                                for (let item of result) {
+                                    let resultLocation = `${item.street} ${item.name}, ${item.postalCode} ${item.city}`;
+                                    
+                                    setLocationInput(resultLocation);
+                                }
+                                
+                                
                                 setModalOpen(!modalOpen);
+                                console.log('loc ' + locationInput)
                             }} 
                         />
                     </View>
