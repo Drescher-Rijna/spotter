@@ -67,8 +67,26 @@ export default function CreateStepTwo(props) {
 
         // upload to storage
         const storageRef = ref(storage, `/${filename}`);
-        const uploadTask = uploadBytesResumable(storageRef, uploadUri);
+        
+        // Using blob to make sure the image actually gets stored correcly through XML
+        const blob = await new Promise((resolve, reject) => {
+            const xhr = new XMLHttpRequest();
+            xhr.onload = function () {
+              resolve(xhr.response);
+            };
+            xhr.onerror = function (e) {
+              console.log(e);
+              reject(new TypeError("Network request failed"));
+            };
+            xhr.responseType = "blob";
+            xhr.open("GET", uploadUri, true);
+            xhr.send(null);
+        });
 
+        // upload task
+        const uploadTask = uploadBytesResumable(storageRef, blob);
+
+        //UPLOADING TASK INITIATES + FIRESTORE
         try {
             uploadTask.on(
                 "state_changed", 
@@ -79,28 +97,27 @@ export default function CreateStepTwo(props) {
                 (err) => console.log(err),
                 async () => {
                     await getDownloadURL(uploadTask.snapshot.ref).
-                    then(url => {
-                        setImageURL(url);
+                    then(async (url) => {
+                        console.log('url: ' + url)
+                        // WRITE TO FIRESTORE
+                        const dbRef = collection(firestore, 'posts');
+                        const postData = {
+                            title: titleInput,
+                            description: descriptionInput,
+                            category: categoryInput,
+                            location: locationInput,
+                            image: url
+                        }
+
+                        try {
+                            console.log('image: ' + postData.image)
+                            await addDoc(dbRef, postData);
+                        } catch (e) {
+                            console.log(e);
+                        }
                     });
                 }
             );
-        } catch (e) {
-            console.log(e);
-        }
-        
-
-        // write to firestore
-        const dbRef = collection(firestore, 'posts');
-        const postData = {
-            title: titleInput,
-            description: descriptionInput,
-            category: categoryInput,
-            location: locationInput,
-            image: imageURL
-        }
-
-        try {
-            await addDoc(dbRef, postData);
         } catch (e) {
             console.log(e);
         }

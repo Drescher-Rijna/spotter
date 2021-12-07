@@ -5,7 +5,7 @@ export default function Home() {
     return (
         <View style={styles.container}>
             <Text>Home</Text>
-        <Image source={{uri: "https://firebasestorage.googleapis.com/v0/b/spotter-8eaff.appspot.com/o/524c1297-ff0d-472a-8d9a-37b9f225a226.jpg?alt=media&token=64af73d5-99f6-4f43-9648-aff50e33b730"}} />
+        <Image style={{width: "100%", height: 360}} source={{uri: 'https://firebasestorage.googleapis.com/v0/b/spotter-8eaff.appspot.com/o/def787b3-fedb-4e2b-a455-8dabcbe39b83.jpg?alt=media&token=3e5e0625-b967-408d-ab48-8bac4eeb3b70'}} />
         </View>
     )
 }
