@@ -26,9 +26,9 @@ export default function CreateStepOne({ navigation }) {
 
     // Take a picture
     const takePicture = async () => {
-        if(camera) {
-            console.log('taking');
+        if(camera) {   
             const data = await camera.takePictureAsync(null);
+            console.log(data);
             setImage(data.uri);
         }
     }
@@ -63,7 +63,7 @@ export default function CreateStepOne({ navigation }) {
     return (
         <View style={styles.container}>
             <View style={styles.containerCamera}>
-            <Camera style={styles.camera} type={type} ratio={'1:1'} ref={ref => setCamera(ref)} />
+            <Camera style={styles.camera} type={type} ratio={'1:1'} ref={ref => setCamera(ref)} autoFocus={true} />
             </View>
 
             {image && <Image source={{uri: image}} style={{flex: 1,}} />}

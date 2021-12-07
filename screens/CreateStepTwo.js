@@ -3,11 +3,17 @@ import React, { useEffect, useState } from 'react'
 import { Button, Dimensions, Image, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import * as Location from 'expo-location';
 import { RadioButton } from 'react-native-paper';
+// mapview and google maps
 import MapView, { Marker } from 'react-native-maps';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
+// Firebase storage and firestore
+import { firestore, storage } from '../App';
+import { getDownloadURL, ref, uploadBytesResumable } from '@firebase/storage';
+import { addDoc, collection } from '@firebase/firestore';
+
 
 export default function CreateStepTwo(props) {
-    const [location, setLocation] = useState(null);
+    // Location states
     const [address, setAddress] = useState(null);
     const [coordinates, setCoordinates] = useState({latitude: 0, longitude: 0});
 
@@ -16,6 +22,7 @@ export default function CreateStepTwo(props) {
     const [descriptionInput, setDescriptionInput] = useState('');
     const [locationInput, setLocationInput] = useState('');
     const [categoryInput, setCategoryInput] = useState('');
+    const [imageURL, setImageURL] = useState('');
 
     // Modal state
     const [modalOpen, setModalOpen] = useState(false);
@@ -35,7 +42,6 @@ export default function CreateStepTwo(props) {
             
             // USING COORDINATES TO GET ADDRESS DATA
             let response = await Location.reverseGeocodeAsync({ latitude: location.coords.latitude, longitude: location.coords.longitude });
-            setLocation(response);
             
 
             // LOOP THROUGH ADRESS DATA TO WRITE IT OUT IN SPECIFIC WAY
@@ -53,13 +59,53 @@ export default function CreateStepTwo(props) {
     
 
     // submittion function
-    const handleSubmit = () => {
-        console.log('submitted')
-        console.log(titleInput);
-        console.log('description')
-        console.log(descriptionInput);
-        console.log(locationInput);
-        console.log(categoryInput);
+    const handleSubmit = async () => {
+        // File path and name for storage and firestore
+        const uploadUri = props.route.params.image;
+        console.log(uploadUri)
+        let filename = uploadUri.substring(uploadUri.lastIndexOf('/') + 1);
+
+        // upload to storage
+        const storageRef = ref(storage, `/${filename}`);
+        const uploadTask = uploadBytesResumable(storageRef, uploadUri);
+
+        try {
+            uploadTask.on(
+                "state_changed", 
+                (snapshot) => {
+                const progress = Math.round((snapshot.bytesTransferred / snapshot.totalBytes ) * 100);
+                // progress state
+                },
+                (err) => console.log(err),
+                async () => {
+                    await getDownloadURL(uploadTask.snapshot.ref).
+                    then(url => {
+                        setImageURL(url);
+                    });
+                }
+            );
+        } catch (e) {
+            console.log(e);
+        }
+        
+
+        // write to firestore
+        const dbRef = collection(firestore, 'posts');
+        const postData = {
+            title: titleInput,
+            description: descriptionInput,
+            category: categoryInput,
+            location: locationInput,
+            image: imageURL
+        }
+
+        try {
+            await addDoc(dbRef, postData);
+        } catch (e) {
+            console.log(e);
+        }
+        
+
     }
     
 

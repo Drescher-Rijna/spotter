@@ -1,10 +1,10 @@
 import 'react-native-gesture-handler';
 import React from 'react';
+
 // Navigation
 import Navigator from './navigation/Navigator';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-
 
 // Screens
 import CreateStepTwo from './screens/CreateStepTwo';
@@ -12,6 +12,8 @@ import CreateStepOne from './screens/CreateStepOne';
 
 // FIREBASE SDK CONFIG
 import { initializeApp } from "firebase/app";
+import { getStorage } from 'firebase/storage';
+import { getFirestore } from 'firebase/firestore';
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -27,9 +29,9 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
-
-
+export const app = initializeApp(firebaseConfig);
+export const storage = getStorage(app);
+export const firestore = getFirestore(app);
 // Stack navigator
 const Stack = createStackNavigator();
 
