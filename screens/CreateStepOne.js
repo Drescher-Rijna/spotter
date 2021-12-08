@@ -13,6 +13,10 @@ export default function CreateStepOne({ navigation }) {
     const [camera, setCamera] = useState(null);
     const [image, setImage] = useState(null);
 
+    // camera focus and zoom states
+    const [zoom, setZoom] = useState(0);
+    const [focus, setFocus] = useState(0);
+
     useEffect(() => {
         (async () => {
             // check for permission for camera
@@ -49,6 +53,13 @@ export default function CreateStepOne({ navigation }) {
         }
     };
 
+
+    // function for zoom
+
+
+    // function for focus
+
+
     // View when it is the first time using the app
     if (hasCameraPermission === null || hasGalleryPermission === null) {
         return <View />;
@@ -63,7 +74,7 @@ export default function CreateStepOne({ navigation }) {
     return (
         <View style={styles.container}>
             <View style={styles.containerCamera}>
-            <Camera style={styles.camera} type={type} ratio={'1:1'} ref={ref => setCamera(ref)} autoFocus={true} />
+            <Camera style={styles.camera} type={type} ratio={'1:1'} ref={ref => setCamera(ref)} autoFocus={Camera.Constants.AutoFocus.on}/>
             </View>
 
             {image && <Image source={{uri: image}} style={{flex: 1,}} />}
