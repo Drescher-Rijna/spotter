@@ -1,15 +1,74 @@
+import { doc, getDoc } from '@firebase/firestore';
 import React from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import { Image, StyleSheet, Text, View } from 'react-native'
+import { useEffect, useState } from 'react/cjs/react.development';
+import { firestore } from '../Firebase';
 
-const SpotDetails = () => {
+const SpotDetails = ({ route, navigation }) => {
+
+    const { id } = route.params;
+
+    const [details, setDetails] = useState({});
+
+    useEffect(async () => {
+        const docRef = doc(firestore, 'posts', id);
+        const docSnap = await getDoc(docRef);
+        console.log(docSnap.data())
+
+        setDetails(docSnap.data());
+    }, [id])
+
     return (
-        <View>
-            <Text></Text>
+        <View style={styles.container}>
+            <Image style={styles.image} source={{uri: details.image}} />
+            <View style={styles.infoCon}>
+                <Text style={styles.title}>{details.title}</Text>
+                <Text style={styles.location}>{details.location}</Text>
+                <Text style={styles.category}>Passer til: {details.category}</Text>
+                <Text style={styles.descriptionTitle}>Beskrivelse:</Text>
+                <Text style={styles.description}>{details.description}</Text>
+            </View>
         </View>
     )
 }
 
 export default SpotDetails
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({
+    container: {
+        
+    },
+    infoCon: {
+        paddingHorizontal: 10,
+        paddingVertical: 5
+    },
+    image: {
+        height: 360,
+        width: '100%',
+    },  
+    title: {
+        fontWeight: 'bold',
+        fontSize: 26,
+        paddingVertical: 5,
+    },
+    location: {
+        fontSize: 16,
+        paddingVertical: 5,
+    },
+    category: {
+       paddingVertical: 5,
+       color: 'black'
+    },
+    descriptionTitle: {
+        fontSize: 18,
+        fontWeight: '700',
+        paddingTop: 5,
+        color: 'black'
+    },  
+    description: {
+        fontSize: 16,
+        paddingBottom: 5,
+    }
+
+})
 

@@ -9,6 +9,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 // Screens
 import CreateStepTwo from './screens/CreateStepTwo';
 import CreateStepOne from './screens/CreateStepOne';
+import SpotDetails from './components/SpotDetails';
 
 
 // Stack navigator
@@ -22,6 +23,7 @@ export default function App() {
         <Stack.Screen name="Navigator" component={Navigator} options={{headerShown: false}} />
         <Stack.Screen name="Post" component={CreateStepOne} />
         <Stack.Screen name="Submit" component={CreateStepTwo} />
+        <Stack.Screen name="Details" component={SpotDetails} />
       </Stack.Navigator>
     </NavigationContainer>
   );
