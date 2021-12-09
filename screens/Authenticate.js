@@ -6,11 +6,28 @@ import RegForm from '../components/RegForm';
 
 export default function Authenticate() {
     // toggle state between register and login form (false = login, true = register)
-    const [register, setRegister] = useState(true);
+    const [register, setRegister] = useState(false);
 
     return (
-        <View>
-            {register ? <RegForm /> : <LoginForm />}
+        <View style={{flex: 1}}>
+            {register ? 
+                <RegForm register={register}/> 
+                
+                : 
+                <LoginForm register={register} />
+            }
+            
+            { /*register ?
+                <View>
+                    <Text>Already have an account?</Text>
+                    <Text onPress={setRegister(false)}>Log in</Text>
+                </View>
+                :
+                <View>
+                    <Text>Don't have an account?</Text>
+                    <Text onPress={setRegister(true)}>Sign up</Text>
+                </View>
+            */}
         </View>
     )
 }

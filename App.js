@@ -12,7 +12,7 @@ import CreateStepOne from './screens/CreateStepOne';
 import SpotDetails from './components/SpotDetails';
 import Authenticate from './screens/Authenticate';
 import { auth } from './Firebase';
-import { useState } from 'react/cjs/react.development';
+import { useEffect, useState } from 'react/cjs/react.development';
 
 
 // Stack navigator
@@ -20,8 +20,14 @@ const Stack = createStackNavigator();
 
 
 export default function App() {
-    
-  if(auth.currentUser) {
+  const [user, setUser] = useState("");
+
+  useEffect(() => {
+    console.log(auth.currentUser)
+    setUser(auth.currentUser);
+  },[auth.currentUser])
+
+  if(user) {
   return (
     <NavigationContainer >
       <Stack.Navigator initialRouteName="Navigator" >
