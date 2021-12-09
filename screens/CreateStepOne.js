@@ -59,6 +59,9 @@ export default function CreateStepOne({ navigation }) {
 
     // function for focus
 
+    
+    // function for white balance
+
 
     // View when it is the first time using the app
     if (hasCameraPermission === null || hasGalleryPermission === null) {

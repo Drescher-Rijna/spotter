@@ -21,17 +21,13 @@ const Stack = createStackNavigator();
 
 export default function App() {
 
-  const [initialRouteName, setInitialRouteName] = useState('Auth');
-
-  if (auth.currentUser) {
-    setInitialRouteName('Navigator')
-  } else {
-    setInitialRouteName('Auth')
-  }
-
+  
+  
+    
+  if(auth.currentUser) {
   return (
     <NavigationContainer >
-      <Stack.Navigator initialRouteName={initialRouteName} >
+      <Stack.Navigator initialRouteName="Navigator" >
         <Stack.Screen name="Navigator" component={Navigator} options={{headerShown: false}} />
         <Stack.Screen name="Post" component={CreateStepOne} />
         <Stack.Screen name="Submit" component={CreateStepTwo} />
@@ -39,6 +35,8 @@ export default function App() {
         <Stack.Screen name="Auth" component={Authenticate} />
       </Stack.Navigator>
     </NavigationContainer>
-  );
+  ); } else {
+    return <Authenticate />
+  }
 }
 

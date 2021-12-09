@@ -1,4 +1,3 @@
-import { Formik } from 'formik'
 import React, { useEffect, useState } from 'react'
 import { Button, Dimensions, Image, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import * as Location from 'expo-location';
