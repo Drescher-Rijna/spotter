@@ -20,9 +20,6 @@ const Stack = createStackNavigator();
 
 
 export default function App() {
-
-  
-  
     
   if(auth.currentUser) {
   return (
@@ -32,7 +29,6 @@ export default function App() {
         <Stack.Screen name="Post" component={CreateStepOne} />
         <Stack.Screen name="Submit" component={CreateStepTwo} />
         <Stack.Screen name="Details" component={SpotDetails} />
-        <Stack.Screen name="Auth" component={Authenticate} />
       </Stack.Navigator>
     </NavigationContainer>
   ); } else {

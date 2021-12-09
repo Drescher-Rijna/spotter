@@ -4,7 +4,7 @@ import { StyleSheet, Text, View } from 'react-native'
 const RegForm = () => {
     return (
         <View>
-            <Text></Text>
+            <Text>hej</Text>
         </View>
     )
 }
