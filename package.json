@@ -30,7 +30,7 @@
     "react-native-firebase": "^5.6.0",
     "react-native-gesture-handler": "^1.10.2",
     "react-native-google-places-autocomplete": "^2.4.1",
-    "react-native-maps": "^0.28.0",
+    "react-native-maps": "^0.28.1",
     "react-native-paper": "^4.10.1",
     "react-native-safe-area-context": "3.3.2",
     "react-native-screens": "~3.8.0",

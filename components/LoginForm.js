@@ -1,31 +1,33 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Button, StyleSheet, Text, TextInput, View } from 'react-native'
-import { useState } from 'react'
 import { signIn } from '../services/Auth';
 
-const LoginForm = ({navigation}) => {
+const LoginForm = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
     return (
         <View style={styles.container}>
-            <Text>Log In</Text>
-            <Text>E-mail:</Text>
-            <TextInput 
-                placeholder="E-mail"
-                value={email}
-                onChangeText={(val) => setEmail(val)}
-            />
-            <Text>Password:</Text>
-            <TextInput 
-                placeholder="Password"
-                value={password}
-                onChangeText={(val) => setPassword(val)}
-            />
-            <Button title="Log In" onPress={async () => {
-                await signIn(email, password)
-                navigation.navigate("Navigator");
-            }} />
+            <View >
+                <Text style={styles.title}>Log In</Text>
+                <Text style={styles.label}>E-mail:</Text>
+                <TextInput 
+                    placeholder="E-mail"
+                    value={email}
+                    onChangeText={(val) => setEmail(val)}
+                    style={styles.input}
+                />
+                <Text style={styles.label}>Password:</Text>
+                <TextInput 
+                    placeholder="Password"
+                    value={password}
+                    onChangeText={(val) => setPassword(val)}
+                    style={styles.input}
+                />
+                <Button title="Log In" onPress={async () => {
+                    await signIn(email, password)
+                }} />
+            </View>
         </View>
     )
 }
@@ -39,12 +41,22 @@ const styles = StyleSheet.create({
         alignItems: "center",
         alignContent: "center"
     },
-
-    input: {
-
+    title: {
+        fontSize: 25,
+        fontWeight: 'bold',
+        marginBottom: 10
     },
-
-    button: {
-
-    }
+    label: {
+        fontSize: 16,
+    },
+    input: {
+        fontSize: 14,
+        borderColor: 'grey',
+        borderWidth: 1,
+        borderRadius: 7,
+        marginBottom: 10,
+        width: 220,
+        paddingHorizontal: 7,
+        paddingVertical: 10
+    },
 })

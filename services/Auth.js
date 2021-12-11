@@ -1,5 +1,6 @@
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "@firebase/auth";
-import { addDoc, collection, doc, setDoc } from "@firebase/firestore";
+import { createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndPassword } from "@firebase/auth";
+import { collection, doc, setDoc } from "@firebase/firestore";
+import { useEffect, useState } from 'react';
 import { auth, firestore } from "../Firebase";
 
 export const signUp = async (username, email, password) => {
@@ -28,4 +29,15 @@ export const signIn = async (email, password) => {
     } catch (e) {
         console.log(e)
     }
+}
+
+export function useAuth() {
+    const [currentUser, setCurrentUser] = useState();
+
+    useEffect(() => {
+        const unsub = onAuthStateChanged(auth, user => setCurrentUser(user));
+        return unsub;
+    }, [])
+
+    return currentUser;
 }

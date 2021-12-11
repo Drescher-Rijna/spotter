@@ -99,7 +99,7 @@ export default function Home({navigation}) {
             {posts ?
                 <ScrollView>
                     {posts.map((post) => (
-                        <SpotPreview key={post.id} title={post.title} category={post.category} location={post.location} image={post.image} id={post.id} navigation={navigation} />
+                        <SpotPreview key={post.id} title={post.title} category={post.category} location={post.location} image={post.image} id={post.id} navigation={navigation} filter={filterVal} searchTerm={searchTerm} />
                     ))}
                 </ScrollView> 
                 
