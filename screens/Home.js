@@ -9,6 +9,7 @@ import { firestore } from '../Firebase'
 import Fuse from 'fuse.js';
 
 export default function Home({navigation}) {
+
     const [posts, setPosts] = useState([]);
 
     //Search field states
@@ -28,8 +29,14 @@ export default function Home({navigation}) {
     // DATABASE REF
     const dbRef = collection(firestore, 'posts');
     // get snapshot of posts in order of timestamp descending
-    useEffect(async () => {
-        // if statements with category state (all, park, street, hybrid) and if searchTerm is something then where()
+    
+
+
+    useEffect(async() => {
+        const unsubscribe = navigation.addListener('focus', async() => {
+          // The screen is focused
+          // Call any action
+          // if statements with category state (all, park, street, hybrid) and if searchTerm is something then where()
         await setPosts(null);
 
         if (filterVal === 'All') {
@@ -64,9 +71,11 @@ export default function Home({navigation}) {
         if (searchTerm) {
             await setPosts(results);
         }
-
-        
-    }, [filterVal, searchTerm])
+        });
+    
+        // Return the function to unsubscribe from the event so it gets removed on unmount
+        return unsubscribe;
+      }, [navigation, filterVal, searchTerm]);
     
 
     return (

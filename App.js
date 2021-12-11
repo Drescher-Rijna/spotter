@@ -12,6 +12,7 @@ import CreateStepOne from './screens/CreateStepOne';
 import SpotDetails from './components/SpotDetails';
 import Authenticate from './screens/Authenticate';
 import currentUser, { useAuth } from './services/Auth';
+import Home from './screens/Home';
 
 
 // Stack navigator
@@ -30,6 +31,7 @@ export default function App() {
           <Stack.Screen name="Post" component={CreateStepOne} />
           <Stack.Screen name="Submit" component={CreateStepTwo} />
           <Stack.Screen name="Details" component={SpotDetails} />
+          <Stack.Screen name="Home" component={Home} />
         </Stack.Navigator>
       </NavigationContainer>
     ); 

@@ -8,7 +8,7 @@ import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplet
 // Firebase storage and firestore
 import { firestore, storage } from '../Firebase';
 import { getDownloadURL, ref, uploadBytesResumable } from '@firebase/storage';
-import { addDoc, collection, Timestamp } from '@firebase/firestore';
+import { addDoc, collection, Timestamp, updateDoc, doc, getDoc } from '@firebase/firestore';
 
 
 export default function CreateStepTwo(props) {
@@ -21,6 +21,7 @@ export default function CreateStepTwo(props) {
     const [descriptionInput, setDescriptionInput] = useState('');
     const [locationInput, setLocationInput] = useState('');
     const [categoryInput, setCategoryInput] = useState('');
+    const [progress, setProgress] = useState(null);
 
     // Modal state
     const [modalOpen, setModalOpen] = useState(false);
@@ -91,6 +92,7 @@ export default function CreateStepTwo(props) {
                 (snapshot) => {
                 const progress = Math.round((snapshot.bytesTransferred / snapshot.totalBytes ) * 100);
                 // progress state
+                setProgress(progress);
                 },
                 (err) => console.log(err),
                 async () => {
@@ -106,15 +108,24 @@ export default function CreateStepTwo(props) {
                             location: locationInput,
                             image: url,
                             uploadTime: Timestamp.now(),
+                            
                         }
 
                         try {
                             console.log('image: ' + postData.image)
-                            await addDoc(dbRef, postData);
+                            await addDoc(dbRef, postData).then(async (document) => {
+                                console.log(document.id)
+                                const docRef = doc(firestore, 'posts', document.id)
+                                await updateDoc(docRef, { id: document.id});
+                            }).then(() => {
+                                setProgress(null);
+                                props.navigation.popToTop();
+                            });
                         } catch (e) {
                             console.log(e);
                         }
                     });
+                    
                 }
             );
         } catch (e) {
@@ -190,7 +201,7 @@ export default function CreateStepTwo(props) {
                         
                         <TouchableOpacity style={styles.submitBtn} onPress={handleSubmit} >
                             <Text style={styles.submitText}>
-                                Post
+                                {progress ? progress + '%' : 'Post'}
                             </Text>
                         </TouchableOpacity>
                     </ScrollView>

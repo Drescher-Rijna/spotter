@@ -4,36 +4,59 @@ import React, { useEffect, useState } from 'react'
 import { StyleSheet, Text, View, Button, ScrollView } from 'react-native'
 import SpotPreview from '../components/SpotPreview'
 import { auth, firestore } from '../Firebase'
-import { useAuth } from '../services/Auth'
 
 export default function Profile({navigation}) {
-    const currentUser = useAuth();
     const [user, setUser] = useState(null);
-    const [posts, setPosts] = useState([]);
-    const [likes, setLikes] = useState([]);
+    const [posts, setPosts] = useState(null);
 
-    useEffect(async () => {
-        console.log('come on')
-        const dbRef = collection(firestore, 'posts');
-        const querySnapshot = await getDocs(dbRef);
-        const results = querySnapshot.docs.map((doc) => ({id: doc.id, ...doc.data()}))
+    
 
-        results.forEach(async (result) => {
-            console.log(result.id)
-           const qRef = collection(firestore, 'posts', result.id, 'likes');
-           try {
-                await getDocs(query(qRef, where('id', '==', auth.currentUser.uid))).then(async (snapshots) => {
-                    await setPosts(snapshots.docs.map((doc) => ({id: doc.id, ...doc.data()})))
-               })
-           } catch(e) {
-                console.log(e)
-           }
-           
-           
-           console.log('data ' + posts)
-        })
-       
-    },[])
+    useEffect(async() => {
+        setPosts(null);
+        const unsubscribe = navigation.addListener('focus', async() => {
+            
+            const userDocRef = doc(firestore, 'users', auth.currentUser.uid)
+            const userRef = await getDoc(userDocRef);
+            setUser(userRef.data());
+
+            const dbRef = collection(firestore, 'posts');
+            const querySnapshot = await getDocs(dbRef);
+            const results = querySnapshot.docs.map((doc) => ({id: doc.id, ...doc.data()}))
+
+            const postsDataList = posts;
+
+            results.forEach(async (result) => {
+            const qRef = collection(firestore, 'posts', result.id, 'likes');
+                
+            try {
+                    await getDocs(query(qRef, where('id', '==', auth.currentUser.uid))).then((snapshots) => {
+                        const likedResult = snapshots.docs.map((doc) => ({id: doc.id, ...doc.data()}))
+
+                        likedResult.forEach(async (item) => {
+                            
+                            const likedPostsRef = doc(firestore, 'posts', item.postID);
+                            const likedPostData = await getDoc(likedPostsRef);
+                            console.log(likedPostData.data())
+                            
+                            postsDataList.push({ id: likedPostData.id, ...likedPostData.data()});
+                            
+                        })
+                        
+                })
+
+                setPosts(postsDataList);
+                        console.log(posts)
+                
+            } catch(e) {
+                    console.log(e)
+            }
+
+            })
+        });
+    
+        // Return the function to unsubscribe from the event so it gets removed on unmount
+        return unsubscribe;
+      }, [navigation]);
 
 
     return (
@@ -63,7 +86,7 @@ export default function Profile({navigation}) {
                     : 
                     
                     <View style={{flex: 1, justifyContent: "center", alignItems: "center", alignContent: "center"}}>
-                        <Text>No result could be found</Text>
+                        <Text>No liked spots</Text>
                     </View>
                     
                 }

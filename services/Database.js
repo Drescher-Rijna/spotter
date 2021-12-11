@@ -3,7 +3,9 @@ import { firestore } from "../Firebase";
 
 export async function likePost (id, userID) {
     const postData = {
-        liked: true
+        liked: true,
+        postID: id,
+        id: userID
     }
 
     try {
