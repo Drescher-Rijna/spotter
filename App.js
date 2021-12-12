@@ -11,8 +11,8 @@ import CreateStepTwo from './screens/CreateStepTwo';
 import CreateStepOne from './screens/CreateStepOne';
 import SpotDetails from './components/SpotDetails';
 import Authenticate from './screens/Authenticate';
-import { auth } from './Firebase';
-import { useState } from 'react/cjs/react.development';
+import currentUser, { useAuth } from './services/Auth';
+import Home from './screens/Home';
 
 
 // Stack navigator
@@ -20,18 +20,22 @@ const Stack = createStackNavigator();
 
 
 export default function App() {
-    
-  if(auth.currentUser) {
-  return (
-    <NavigationContainer >
-      <Stack.Navigator initialRouteName="Navigator" >
-        <Stack.Screen name="Navigator" component={Navigator} options={{headerShown: false}} />
-        <Stack.Screen name="Post" component={CreateStepOne} />
-        <Stack.Screen name="Submit" component={CreateStepTwo} />
-        <Stack.Screen name="Details" component={SpotDetails} />
-      </Stack.Navigator>
-    </NavigationContainer>
-  ); } else {
+  const currentUser = useAuth();
+  console.log(currentUser?.email);
+
+  if(currentUser) {
+    return (
+      <NavigationContainer >
+        <Stack.Navigator initialRouteName="Navigator" >
+          <Stack.Screen name="Navigator" component={Navigator} options={{headerShown: false}} />
+          <Stack.Screen name="Post" component={CreateStepOne} />
+          <Stack.Screen name="Submit" component={CreateStepTwo} />
+          <Stack.Screen name="Details" component={SpotDetails} />
+          <Stack.Screen name="Home" component={Home} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    ); 
+  } else {
     return <Authenticate />
   }
 }
