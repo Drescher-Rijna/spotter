@@ -5,7 +5,7 @@ import { likePost, unlikePost, useDB } from '../services/Database';
 import { doc, getDoc } from '@firebase/firestore';
 import { auth, firestore } from '../Firebase';
 
-const SpotPreview = ({title, category, location, image, id, navigation}) => {
+const SpotPreview = ({title, category, location, image, id, navigation} ) => {
     // State for like button
     const [likeColor, setLikeColor] = useState('black');
     const [likeIcon, setLikeIcon] = useState('heart-outline');

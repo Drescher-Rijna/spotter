@@ -21,6 +21,7 @@ const LoginForm = () => {
                 <TextInput 
                     placeholder="Password"
                     value={password}
+                    secureTextEntry={true}
                     onChangeText={(val) => setPassword(val)}
                     style={styles.input}
                 />
@@ -36,7 +37,6 @@ export default LoginForm
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
         justifyContent: "center",
         alignItems: "center",
         alignContent: "center"

@@ -7,9 +7,11 @@ import { useEffect, useState } from 'react/cjs/react.development';
 import SpotPreview from '../components/SpotPreview';
 import { firestore } from '../Firebase'
 import Fuse from 'fuse.js';
+import { connect } from 'react-redux'
 
-export default function Home({navigation}) {
 
+function Home(props, {navigation}) {
+    console.log(navigation)
     const [posts, setPosts] = useState([]);
 
     //Search field states
@@ -30,9 +32,29 @@ export default function Home({navigation}) {
     const dbRef = collection(firestore, 'posts');
     // get snapshot of posts in order of timestamp descending
     
-
-
     useEffect(async() => {
+        console.log(filterVal)
+        if (filterVal === 'Park' || filterVal === 'Street' || filterVal === 'Hybrid') {
+
+            setPosts(props.feed.filter(x => x.category == filterVal));
+            console.log(posts)
+        } else {
+            setPosts(props.feed);
+        }
+
+        // SEARCH RESULTS
+        const fuse = new Fuse(posts, {threshold: 0.4, keys: ['category', 'title', 'location']})
+        const results = fuse.search(searchTerm).map(({ item }) => item);
+
+        if (searchTerm) {
+            await setPosts(results);
+        }
+
+        
+
+    }, [props.feed, filterVal, searchTerm, navigation])
+
+    {/*useEffect(async() => {
         const unsubscribe = navigation.addListener('focus', async() => {
           // The screen is focused
           // Call any action
@@ -75,7 +97,7 @@ export default function Home({navigation}) {
     
         // Return the function to unsubscribe from the event so it gets removed on unmount
         return unsubscribe;
-      }, [navigation, filterVal, searchTerm]);
+      }, [navigation, filterVal, searchTerm]);*/}
     
 
     return (
@@ -108,7 +130,7 @@ export default function Home({navigation}) {
             {posts ?
                 <ScrollView>
                     {posts.map((post) => (
-                        <SpotPreview key={post.id} title={post.title} category={post.category} location={post.location} image={post.image} id={post.id} navigation={navigation} filter={filterVal} searchTerm={searchTerm} />
+                        <SpotPreview key={post.id} title={post.title} category={post.category} location={post.location} image={post.image} id={post.id} />
                     ))}
                 </ScrollView> 
                 
@@ -123,6 +145,12 @@ export default function Home({navigation}) {
         </View>
     )
 }
+
+const mapStateToProps = (store) => ({
+    feed: store.usersState.feed,
+})
+
+export default connect(mapStateToProps, null)(Home);
 
 const styles = StyleSheet.create({
     container: {
