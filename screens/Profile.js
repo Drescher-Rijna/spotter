@@ -1,62 +1,44 @@
 import { signOut } from '@firebase/auth'
-import { collection, doc, getDoc, getDocs, query, where } from '@firebase/firestore'
+import { collection, doc, getDoc, getDocs, orderBy, query, where } from '@firebase/firestore'
 import React, { useEffect, useState } from 'react'
-import { StyleSheet, Text, View, Button, ScrollView } from 'react-native'
+import { StyleSheet, Text, View, Button, ScrollView, FlatList } from 'react-native'
+import { connect } from 'react-redux'
 import SpotPreview from '../components/SpotPreview'
 import { auth, firestore } from '../Firebase'
 
-export default function Profile({navigation}) {
+function Profile(props) {
     const [user, setUser] = useState(null);
     const [posts, setPosts] = useState(null);
 
     
 
     useEffect(async() => {
-        setPosts(null);
-        const unsubscribe = navigation.addListener('focus', async() => {
-            
-            const userDocRef = doc(firestore, 'users', auth.currentUser.uid)
+        const userDocRef = doc(firestore, 'users', auth.currentUser.uid)
             const userRef = await getDoc(userDocRef);
             setUser(userRef.data());
 
-            const dbRef = collection(firestore, 'posts');
-            const querySnapshot = await getDocs(dbRef);
-            const results = querySnapshot.docs.map((doc) => ({id: doc.id, ...doc.data()}))
+        const likesDocRef = collection(firestore, 'posts')
+        try {
 
-            const postsDataList = posts;
+            const querySnapshot = await getDocs(query(likesDocRef, where('likes', 'array-contains', auth.currentUser.uid), orderBy('uploadTime', 'desc')));
+            await setPosts(querySnapshot.docs.map((doc) => ({id: doc.id, ...doc.data()})))
+            console.log(posts)
+        } catch (e) {
+            console.log(e);
+        }   
 
-            results.forEach(async (result) => {
-            const qRef = collection(firestore, 'posts', result.id, 'likes');
-                
-            try {
-                    await getDocs(query(qRef, where('id', '==', auth.currentUser.uid))).then((snapshots) => {
-                        const likedResult = snapshots.docs.map((doc) => ({id: doc.id, ...doc.data()}))
+      }, []);
 
-                        likedResult.forEach(async (item) => {
-                            
-                            const likedPostsRef = doc(firestore, 'posts', item.postID);
-                            const likedPostData = await getDoc(likedPostsRef);
-                            console.log(likedPostData.data())
-                            
-                            postsDataList.push({ id: likedPostData.id, ...likedPostData.data()});
-                            
-                        })
-                        
-                })
-
-                setPosts(postsDataList);
-                        console.log(posts)
-                
-            } catch(e) {
-                    console.log(e)
-            }
-
-            })
-        });
-    
-        // Return the function to unsubscribe from the event so it gets removed on unmount
-        return unsubscribe;
-      }, [navigation]);
+      const renderLoader = () => {
+        return (
+            <View>
+                <ActivityIndicator size='large' color='#aaa' style={{marginVertical: 16, alignItems: 'center'}} />
+            </View>
+        )
+    }
+    const loadMoreItem = () => {
+        console.log('loading more')
+    }
 
 
     return (
@@ -77,11 +59,17 @@ export default function Profile({navigation}) {
 
             <View style={styles.feed}>
                 {posts ?
-                    <ScrollView>
-                        {posts.map((post) => (
-                            <SpotPreview key={post.id} title={post.title} category={post.category} location={post.location} image={post.image} id={post.id} navigation={navigation} />
-                        ))}
-                    </ScrollView> 
+                    <FlatList 
+                        data={posts}
+                        renderItem={({ item }) => (
+                            <SpotPreview post={item} navigation={props.navigation} />
+                        )}
+                        
+                        ListFooterComponent={posts.length > 3 ? renderLoader : null}
+                        onEndReached={posts.length > 3 ? loadMoreItem : null}
+                        onEndReachedThreshold={0}
+                        
+                    />
                     
                     : 
                     
@@ -94,6 +82,12 @@ export default function Profile({navigation}) {
         </View>
     )
 }
+
+const mapStateToProps = (store) => ({
+    feed: store.usersState.feed,
+})
+
+export default connect(mapStateToProps, null)(Profile);
 
 const styles = StyleSheet.create({
     container: {

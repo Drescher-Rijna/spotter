@@ -5,7 +5,7 @@ import { likePost, unlikePost} from '../services/Database';
 import { auth, firestore } from '../Firebase';
 import { Ionicons } from '@expo/vector-icons';
 
-const SpotDetails = ({ route, navigation }) => {
+const SpotDetails = ({ route }) => {
     // id
     const { id } = route.params;
     
