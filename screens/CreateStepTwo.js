@@ -27,7 +27,7 @@ export default function CreateStepTwo(props) {
     const [modalOpen, setModalOpen] = useState(false);
 
     useEffect(async () => {
-            //PERMISSION REQUEST
+            //PERMISSION REQUEST 
             let { status } = await Location.requestForegroundPermissionsAsync();
             if (status !== 'granted') {
                 setErrorMsg('Permission to access location was denied');
