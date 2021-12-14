@@ -4,6 +4,8 @@ import { useState } from 'react/cjs/react.development'
 // Camera packages
 import { Camera } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
+import Slider from '@react-native-community/slider';
+import { FaceDetectorClassifications, FaceDetectorLandmarks, FaceDetectorMode } from 'expo-face-detector';
 
 export default function CreateStepOne({ navigation }) {
     // Camera and gallery states
@@ -31,7 +33,7 @@ export default function CreateStepOne({ navigation }) {
     // Take a picture
     const takePicture = async () => {
         if(camera) {   
-            const data = await camera.takePictureAsync(null);
+            const data = await camera.takePictureAsync();
             console.log(data);
             setImage(data.uri);
         }
@@ -54,15 +56,6 @@ export default function CreateStepOne({ navigation }) {
     };
 
 
-    // function for zoom
-
-
-    // function for focus
-
-    
-    // function for white balance
-
-
     // View when it is the first time using the app
     if (hasCameraPermission === null || hasGalleryPermission === null) {
         return <View />;
@@ -77,11 +70,56 @@ export default function CreateStepOne({ navigation }) {
     return (
         <View style={styles.container}>
             <View style={styles.containerCamera}>
-            <Camera style={styles.camera} type={type} ratio={'1:1'} ref={ref => setCamera(ref)} autoFocus={Camera.Constants.AutoFocus.on}/>
+                {image ? 
+                    <Image source={{uri: image}} style={{flex: 1, aspectRatio: 1}} /> :
+                    <Camera style={styles.camera} autoFocus='on' zoom={zoom}  type={type} ratio={'1:1'} ref={ref => setCamera(ref)} />
+                }
             </View>
 
-            {image && <Image source={{uri: image}} style={{flex: 1,}} />}
-
+            <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+                {image ? <TouchableOpacity style={{padding: 10, backgroundColor: 'dodgerblue'}} onPress={() => setImage(null)}><Text style={{color: 'black'}}>Tag et nyt billed</Text></TouchableOpacity> :
+                    <View style={{width: '100%', flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+                        <View style={{width: '100%', marginHorizontal: 10,}}>
+                            <Text style={{textAlign: 'center'}}>Zoom</Text>
+                            <Text style={{textAlign: 'center'}}>{Math.round(zoom * 100) / 100}</Text>
+                            <Slider 
+                                style={{width: '100%' , height: 40,}}
+                                minimumValue={0}
+                                maximumValue={1}
+                                value={zoom}
+                                minimumTrackTintColor="#FFFFFF"
+                                maximumTrackTintColor="#000000"
+                                onSlidingComplete={(val) => setZoom(val)}
+                                
+                            />
+                        </View>
+                        <View style={{width: '100%', marginHorizontal: 10,}}>
+                            <Text style={{textAlign: 'center'}}>Focus</Text>
+                            <Text style={{textAlign: 'center'}}>{Math.round(focus * 100) / 100}</Text>
+                            <Slider 
+                                style={{width: '100%' , height: 40,}}
+                                minimumValue={0}
+                                maximumValue={1}
+                                value={focus}
+                                minimumTrackTintColor="#FFFFFF"
+                                maximumTrackTintColor="#000000"
+                                onSlidingComplete={(val) => setFocus(val)}
+                                
+                            />
+                        </View>
+                        <View style={styles.buttonTakeCon}>
+                            <TouchableOpacity
+                                style={styles.buttonTake}
+                                onPress={()=> takePicture()}
+                            />
+                        </View>
+                    </View>
+                }
+                
+                
+                
+            </View>
+            
             <View style={styles.buttonsContainer}>
                 <TouchableOpacity
                     style={styles.buttonFlip}
@@ -96,12 +134,7 @@ export default function CreateStepOne({ navigation }) {
                     <Text style={styles.buttonText}>Flip</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity
-                    style={styles.buttonTake}
-                    onPress={()=> takePicture()}
-                >
-                    <Text style={styles.buttonText}>Take</Text>
-                </TouchableOpacity>
+                
 
                 <TouchableOpacity 
                     style={styles.buttonPick}
@@ -111,7 +144,11 @@ export default function CreateStepOne({ navigation }) {
                 </TouchableOpacity>
                 <TouchableOpacity 
                     style={styles.buttonSave}
-                    onPress={() => navigation.navigate("Submit", {image})}
+                    onPress={() => {
+                        if (image) {
+                            navigation.navigate("Submit", {image})
+                        }
+                    }}
                 >
                     <Text style={styles.buttonText}>Next</Text>
                 </TouchableOpacity>
@@ -136,10 +173,28 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
     },
     buttonTake: {
-        backgroundColor: 'green',
-        flex: 1,
-        paddingBottom: 10,
-        paddingTop: 10,
+        width: 90,
+        height: 90,
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 10,
+        borderRadius: 100,
+        backgroundColor: 'white',
+        borderColor: 'black',
+        borderWidth: 1.5,
+        
+    },
+    buttonTakeCon: {
+        width: 100,
+        height: 100,
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 10,
+        borderRadius: 100,
+        backgroundColor: 'white',
+        borderColor: 'black',
+        borderWidth: 1.5,
+        marginTop: 20
     },
     buttonFlip: {
         backgroundColor: 'blue',

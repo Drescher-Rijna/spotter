@@ -5,20 +5,20 @@ import { likePost, unlikePost, useDB } from '../services/Database';
 import { doc, getDoc } from '@firebase/firestore';
 import { auth, firestore } from '../Firebase';
 
-const SpotPreview = ({title, category, location, image, id, navigation} ) => {
+const SpotPreview = ( props ) => {
     // State for like button
     const [likeColor, setLikeColor] = useState('black');
     const [likeIcon, setLikeIcon] = useState('heart-outline');
     const [liked, setLiked] = useState(false);
 
     const goToDetails = (id) => {
-        console.log(id);
-        navigation.navigate('Details', {
+        console.log(props.navigation);
+        props.navigation.navigate('Details', {
             id: id,
         });   
     }
 
-    const handleLike = () => {
+    const handleLike = (id) => {
         if (liked) {
             setLikeIcon('heart-outline')
             setLikeColor('black')
@@ -34,10 +34,10 @@ const SpotPreview = ({title, category, location, image, id, navigation} ) => {
 
 
     useEffect(async() => {
-        console.log('come on')
-        const docRef = doc(firestore, 'posts', id, 'likes', auth.currentUser.uid)
+        console.log('likes')
+        const docRef = doc(firestore, 'posts', props.post.id, 'likes', auth.currentUser.uid)
         const result = await getDoc(docRef).then((doc) => {
-            console.log(doc.exists)
+            console.log(doc.id)
             if (doc.exists) {
                 setLiked(doc.data().liked)
                 setLikeColor('red')
@@ -48,26 +48,30 @@ const SpotPreview = ({title, category, location, image, id, navigation} ) => {
                 setLikeIcon('heart-outline')
             }
 
-            console.log(liked)
+            
         });
         
         return () => result();
+
+        
     },[liked])
 
     return (
-        <TouchableOpacity onPress={() => goToDetails(id)} >
+        <TouchableOpacity onPress={() => goToDetails(props.post.id)} >
             <View style={styles.container}>
-                <Image style={styles.image} source={{uri: image}} />
+                <Image style={styles.image} source={{uri: props.post.image}} />
                 <View style={styles.infoCon}>
-                    <Text style={styles.title}>{title}</Text>
-                    <Text style={styles.location}>{location}</Text>
-                    <Text style={styles.category}>Passer til: {category}</Text>
+                    <Text style={styles.title}>{props.post.title}</Text>
+                    <Text style={styles.location}>{props.post.location}</Text>
+                    <Text style={styles.category}>Passer til: {props.post.category}</Text>
                 </View>
-                <Ionicons style={{marginRight: 10, marginTop: 7}} name={likeIcon} color={likeColor} size={24} onPress={() => handleLike()} />
+                <Ionicons style={{marginRight: 10, marginTop: 7}} name={likeIcon} color={likeColor} size={24} onPress={() => handleLike(props.post.id)} />
             </View>
         </TouchableOpacity>
     )
 }
+
+
 
 export default SpotPreview
 
@@ -102,4 +106,7 @@ const styles = StyleSheet.create({
         borderBottomLeftRadius: 7,
     }
 })
+
+
+
 

@@ -1,7 +1,8 @@
-import { USERS_LIKES_STATE_CHANGE, POSTS_STATE_CHANGE, CLEAR_DATA } from "../constants"
+import {POSTS_STATE_CHANGE, CLEAR_DATA } from "../constants"
 
 const initialState = {
     feed: [],
+    likes: []
 }
 
 export const users = (state = initialState, action) => {

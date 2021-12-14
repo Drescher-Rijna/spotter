@@ -1,6 +1,6 @@
-import { collection, getDocs, orderBy, query, where } from '@firebase/firestore';
+import { collection } from '@firebase/firestore';
 import React from 'react'
-import { ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
+import { ActivityIndicator, FlatList, ScrollView, StyleSheet, Text, View } from 'react-native'
 import DropDownPicker from 'react-native-dropdown-picker';
 import { SearchBar } from 'react-native-elements';
 import { useEffect, useState } from 'react/cjs/react.development';
@@ -10,8 +10,7 @@ import Fuse from 'fuse.js';
 import { connect } from 'react-redux'
 
 
-function Home(props, {navigation}) {
-    console.log(navigation)
+function Home(props) {
     const [posts, setPosts] = useState([]);
 
     //Search field states
@@ -28,16 +27,13 @@ function Home(props, {navigation}) {
     ]);
     const [filterVal, setFilterVal] = useState("All");
 
-    // DATABASE REF
-    const dbRef = collection(firestore, 'posts');
-    // get snapshot of posts in order of timestamp descending
     
     useEffect(async() => {
-        console.log(filterVal)
+        
         if (filterVal === 'Park' || filterVal === 'Street' || filterVal === 'Hybrid') {
 
             setPosts(props.feed.filter(x => x.category == filterVal));
-            console.log(posts)
+            
         } else {
             setPosts(props.feed);
         }
@@ -52,52 +48,18 @@ function Home(props, {navigation}) {
 
         
 
-    }, [props.feed, filterVal, searchTerm, navigation])
+    }, [props.feed, filterVal, searchTerm, props.navigation])
 
-    {/*useEffect(async() => {
-        const unsubscribe = navigation.addListener('focus', async() => {
-          // The screen is focused
-          // Call any action
-          // if statements with category state (all, park, street, hybrid) and if searchTerm is something then where()
-        await setPosts(null);
-
-        if (filterVal === 'All') {
-                const querySnapshot = await getDocs(query(dbRef, orderBy('uploadTime')));
-                await setPosts(querySnapshot.docs.map((doc) => ({id: doc.id, ...doc.data()})))
-        }
-
-        if (filterVal === 'Park') {
-                const querySnapshot = await getDocs(query(dbRef, where("category", "==", filterVal), orderBy('uploadTime')));
-                await setPosts(querySnapshot.docs.map((doc) => ({id: doc.id, ...doc.data()})))
-                console.log("havd nu" + posts.length)
-        }
-
-        if (filterVal === 'Street') {
-                const querySnapshot = await getDocs(query(dbRef, where("category", "==", filterVal), orderBy('uploadTime')));
-                await setPosts(querySnapshot.docs.map((doc) => ({id: doc.id, ...doc.data()})))
-        }
-
-        if (filterVal === 'Hybrid') {
-                try {
-                    const querySnapshot = await getDocs(query(dbRef, where("category", "==", filterVal), orderBy('uploadTime')));
-                    await setPosts(querySnapshot.docs.map((doc) => ({id: doc.id, ...doc.data()})))
-                } catch (e) {
-                    console.log(e)
-                }
-        }
-
-        // SEARCH RESULTS
-        const fuse = new Fuse(posts, {threshold: 0.4, keys: ['category', 'title', 'location']})
-        const results = fuse.search(searchTerm).map(({ item }) => item);
-
-        if (searchTerm) {
-            await setPosts(results);
-        }
-        });
-    
-        // Return the function to unsubscribe from the event so it gets removed on unmount
-        return unsubscribe;
-      }, [navigation, filterVal, searchTerm]);*/}
+    const renderLoader = () => {
+        return (
+            <View>
+                <ActivityIndicator size='large' color='#aaa' style={{marginVertical: 16, alignItems: 'center'}} />
+            </View>
+        )
+    }
+    const loadMoreItem = () => {
+        console.log('loading more')
+    }
     
 
     return (
@@ -126,13 +88,18 @@ function Home(props, {navigation}) {
                 </View>
             </View>
 
-            {/* map data and render the template */}
             {posts ?
-                <ScrollView>
-                    {posts.map((post) => (
-                        <SpotPreview key={post.id} title={post.title} category={post.category} location={post.location} image={post.image} id={post.id} />
-                    ))}
-                </ScrollView> 
+                <FlatList 
+                    data={posts}
+                    renderItem={({ item }) => (
+                        <SpotPreview post={item} navigation={props.navigation} />
+                    )}
+                    
+                    ListFooterComponent={posts.length > 3 ? renderLoader : null}
+                    onEndReached={posts.length > 3 ? loadMoreItem : null}
+                    onEndReachedThreshold={0}
+                    
+                />
                 
                 : 
                 

@@ -57,7 +57,8 @@ export class Navigator extends Component {
 }
 
 const mapStateToProps = (store) => ({
-    currentUser: store.userState.currentUser
+    currentUser: store.userState.currentUser,
+    currentUserLike: store.userState.currentUserLike
 })
 const mapDispatchProps = (dispatch) => bindActionCreators({ fetchUser, fetchPosts }, dispatch);
 
