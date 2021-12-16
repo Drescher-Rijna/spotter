@@ -15,29 +15,34 @@ export default function CreateStepOne({ navigation }) {
 
     // camera focus and zoom states
     const [zoom, setZoom] = useState(0);
-    const [focus, setFocus] = useState(0);
 
+
+    // Tjekker status for tilladelse til kamera og galleri
     useEffect(() => {
         (async () => {
-            // check for permission for camera
+            // check for tilladelse til kamera
             const cameraStatus = await Camera.requestCameraPermissionsAsync();
             setHasCameraPermission(cameraStatus.status === 'granted');
-            // check for permission for gallery
+            // check for tilladelse til galleriet
             const galleryStatus = await ImagePicker.requestMediaLibraryPermissionsAsync();
             setHasGalleryPermission(galleryStatus.status === 'granted');
         })();
     }, []);
 
-    // Take a picture
+
+
+    // Tag et billede
     const takePicture = async () => {
         if(camera) {   
-            const data = await camera.takePictureAsync();
+            const data = await camera.takePictureAsync({
+                quality: 1,
+            });
             console.log(data);
             setImage(data.uri);
         }
     }
 
-    // Pick an image
+    // Vælg et billede
     const pickImage = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
           mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -54,17 +59,17 @@ export default function CreateStepOne({ navigation }) {
     };
 
 
-    // View when it is the first time using the app
+    // View hvis det er første gang man bruger appen
     if (hasCameraPermission === null || hasGalleryPermission === null) {
         return <View />;
     }
 
-    // View when permission is not granted
+    // View hvis tilladelse til brug af kameraet og galleriet ikke er givet
     if (hasCameraPermission === false || hasGalleryPermission === false) {
-        return <Text>No access to camera</Text>;
+        return <Text>Mulighed for at lave indlæg skal bruge tilladelse til brug af kamera eller galleri</Text>;
     }
 
-    // View when permission is granted
+    // View hvis tilladelse til kamera og galleri er givet
     return (
         <View style={styles.container}>
             <View style={styles.containerCamera}>
@@ -77,6 +82,7 @@ export default function CreateStepOne({ navigation }) {
             <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
                 {image ? <TouchableOpacity style={{padding: 10, backgroundColor: 'dodgerblue'}} onPress={() => setImage(null)}><Text style={{color: 'black'}}>Tag et nyt billed</Text></TouchableOpacity> :
                     <View style={{width: '100%', flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+                        {/*Mulighed for at zoom ind og ud*/}
                         <View style={{width: '100%', marginHorizontal: 10,}}>
                             <Text style={{textAlign: 'center'}}>Zoom</Text>
                             <Text style={{textAlign: 'center'}}>{Math.round(zoom * 100) / 100}</Text>
@@ -91,20 +97,8 @@ export default function CreateStepOne({ navigation }) {
                                 
                             />
                         </View>
-                        <View style={{width: '100%', marginHorizontal: 10,}}>
-                            <Text style={{textAlign: 'center'}}>Focus</Text>
-                            <Text style={{textAlign: 'center'}}>{Math.round(focus * 100) / 100}</Text>
-                            <Slider 
-                                style={{width: '100%' , height: 40,}}
-                                minimumValue={0}
-                                maximumValue={1}
-                                value={focus}
-                                minimumTrackTintColor="#FFFFFF"
-                                maximumTrackTintColor="#000000"
-                                onSlidingComplete={(val) => setFocus(val)}
-                                
-                            />
-                        </View>
+                        
+                        {/* Mulighed for at tage et billede */}
                         <View style={styles.buttonTakeCon}>
                             <TouchableOpacity
                                 style={styles.buttonTake}
@@ -133,7 +127,7 @@ export default function CreateStepOne({ navigation }) {
                 </TouchableOpacity>
 
                 
-
+                {/* Mulighed for at vælge et billed */}
                 <TouchableOpacity 
                     style={styles.buttonPick}
                     onPress={()=> pickImage()}
@@ -144,7 +138,7 @@ export default function CreateStepOne({ navigation }) {
                     style={styles.buttonSave}
                     onPress={() => {
                         if (image) {
-                            navigation.navigate("Submit", {image})
+                            navigation.navigate("Upload", {image})
                         }
                     }}
                 >

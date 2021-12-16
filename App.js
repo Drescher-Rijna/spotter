@@ -73,8 +73,8 @@ export class App extends Component {
           <Stack.Navigator initialRouteName="Navigator" >
             <Stack.Screen name="Navigator" component={Navigator} options={{headerShown: false}} />
             <Stack.Screen name="Post" component={CreateStepOne} />
-            <Stack.Screen name="Submit" component={CreateStepTwo} />
-            <Stack.Screen name="Home" component={Home} />
+            <Stack.Screen name="Upload" component={CreateStepTwo} />
+            <Stack.Screen name="Hjem" component={Home} />
             <Stack.Screen name="Details" component={SpotDetails} />
             <Stack.Screen name="Preview" component={SpotPreview} />
           </Stack.Navigator>

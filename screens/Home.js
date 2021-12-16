@@ -16,12 +16,12 @@ function Home(props) {
     // filter state
     const [open, setOpen] = useState(false);
     const [items, setItems] = useState([
-        {label: 'All', value: 'All'},
+        {label: 'Alle', value: 'Alle'},
         {label: 'Park', value: 'Park'},
         {label: 'Street', value: 'Street'},
         {label: 'Hybrid', value: 'Hybrid'}
     ]);
-    const [filterVal, setFilterVal] = useState("All");
+    const [filterVal, setFilterVal] = useState("Alle");
     
     useEffect(async() => {
         
@@ -67,12 +67,12 @@ function Home(props) {
                     searchIcon={{ size: 24 }}
                     onChangeText={text => setSearchTerm(text)}
                     onClear={text => setSearchTerm('')}
-                    placeholder="Type Here..."
+                    placeholder="Skriv her..."
                     value={searchTerm}
                 />
                 
                 <View style={{marginHorizontal: 10}}>
-                    <Text style={{fontSize: 16, fontWeight: "bold", marginTop: 10}}>Category:</Text>
+                    <Text style={{fontSize: 16, fontWeight: "bold", marginTop: 10}}>Kategori:</Text>
                     <DropDownPicker 
                         open={open}
                         value={filterVal}
@@ -100,7 +100,7 @@ function Home(props) {
                 : 
                 
                 <View style={{flex: 1, justifyContent: "center", alignItems: "center", alignContent: "center"}}>
-                    <Text>No result could be found</Text>
+                    <Text>Ingen spots fundet</Text>
                 </View>
                 
             }

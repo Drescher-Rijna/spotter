@@ -27,27 +27,24 @@ export default function CreateStepTwo(props) {
     const [modalOpen, setModalOpen] = useState(false);
 
     useEffect(async () => {
-            //PERMISSION REQUEST 
+            // Tilladelse om brug af GPS
             let { status } = await Location.requestForegroundPermissionsAsync();
             if (status !== 'granted') {
-                setErrorMsg('Permission to access location was denied');
+                setErrorMsg('Tilladelse til GPS lokation er ikke givet');
             return;
             }
 
-            // GETTING LOCATION IF GRANTED
+            // Få fat i nuværende position hvis der er givet tilladelse
             let location = await Location.getCurrentPositionAsync({});
-        
             
-            
-            // USING COORDINATES TO GET ADDRESS DATA
+            // Brug af koordinaterne af lokationen til at få adressen
             let response = await Location.reverseGeocodeAsync({ latitude: location.coords.latitude, longitude: location.coords.longitude });
-            
-
-            // LOOP THROUGH ADRESS DATA TO WRITE IT OUT IN SPECIFIC WAY
+        
+            // Loop gennem adressens data til at lave en string, hvor adressen er formatteret gade, nummer, postnummer, by
             for (let item of response) {
                 let resultAddress = `${item.street} ${item.name}, ${item.postalCode} ${item.city}`;
                 
-                // SET THE ADDRESS TO A STATE
+                // Sæt adressen til en state
                 setAddress(resultAddress);
                 setLocationInput(resultAddress)
             }
@@ -138,13 +135,13 @@ export default function CreateStepTwo(props) {
 
     return (
         <View style={styles.container}>
-            {/* IMAGE FROM PREVIOUS STEP */}
+            {/* BILLED FRA FØRHENVÆRENDE STEP */}
             <Image style={styles.imagePrev} source={{ uri: props.route.params.image }} />
             
-            {/* FORM WITH LOCATION INFO */}
+            {/* FORM MED LOKATION INFO */}
             
                     <ScrollView style={styles.formCon}>
-                        {/* TITLE */}
+                        {/* TITEL */}
                         <Text style={styles.label} >Spot name & description</Text>
                         <TextInput 
                             style={styles.inputFields}
@@ -153,7 +150,7 @@ export default function CreateStepTwo(props) {
                             onChangeText={val => {setTitleInput(val); console.log(val);}}
                         />
 
-                        {/* DESCRIPTION */}
+                        {/* BESKRIVELSE */}
                         <TextInput
                             style={styles.textArea}
                             placeholder='Describe the spot...'
@@ -161,13 +158,13 @@ export default function CreateStepTwo(props) {
                             onChangeText={val => {setDescriptionInput(val); console.log(val);}}
                         />
 
-                        {/* LOCATION */}
+                        {/* LOKATION*/}
                         <View style={styles.locationInput}>
-                            <Text style={styles.label}>Location</Text>
+                            <Text style={styles.label}>Lokation</Text>
                             <View style={{flexDirection: 'row'}}>
                                 <TextInput 
                                     style={{flex: 0.7}}
-                                    placeholder='Location'
+                                    placeholder='Lokation'
                                     value={locationInput}
                                     editable={false}
                                 />
@@ -178,7 +175,7 @@ export default function CreateStepTwo(props) {
                         </View>
                         
 
-                        {/* CATEGORY */}
+                        {/* KATEGORI */}
                         <Text style={styles.label} >Category</Text>
                         <View style={styles.categoryInput}>
                             <RadioButton.Group value={categoryInput} onValueChange={(val) => {setCategoryInput(val)}}>
@@ -215,19 +212,19 @@ export default function CreateStepTwo(props) {
                         GooglePlacesSearchQuery={{
                             rankby: "distance"
                         }}
-                        onFail={(error) => console.error(error)}
-                        onPress={(data, details = null) => {
-                            // 'details' is provided when fetchDetails = true
-                            setCoordinates({
-                                latitude: details.geometry.location.lat,
-                                longitude: details.geometry.location.lng,
-                            })
-                        }}
                         query={{
                             key: "AIzaSyC98flPHNxCKCi2Sq3oxKJ4kVdeApkwR3c",
                             language: "da",
                             components: "country:dk",
                             location: address
+                        }}
+                        onFail={(error) => console.error(error)}
+                        onPress={(data, details = null) => {
+                            // 'details' er givet når fetchDetails er true
+                            setCoordinates({
+                                latitude: details.geometry.location.lat,
+                                longitude: details.geometry.location.lng,
+                            })
                         }}
                         styles={{
                             container: { flex: 0, position: "absolute", width: "100%", zIndex: 5, borderRadius: 0 },
@@ -236,21 +233,19 @@ export default function CreateStepTwo(props) {
                     />
 
                     <View style={{zIndex: 3, flexDirection: 'row', justifyContent: 'space-between', marginHorizontal: 10, marginTop: 55, marginBottom: 10}}>
-                        <Button title="Back" onPress={() => setModalOpen(false)} />
-                        {/* Make it so when they press the new coords are made to a address and make choosenLocation into that */}
-                        <Button title="Confirm location" onPress={async() => {
+                        <Button title="Tilbage" onPress={() => setModalOpen(false)} />
+                        {/* Når de trykker bekræft skal de nye koordinater give en ny adresse som skal sættes i useState */}
+                        <Button title="Bekræft" onPress={async() => {
+                                // få den nye adresse
                                 let result = await Location.reverseGeocodeAsync({latitude: coordinates.latitude, longitude: coordinates.longitude});
-                                console.log(result)
-
+                                // loop gennem adresse data og lav en string til adressen som sættes til useState
                                 for (let item of result) {
                                     let resultLocation = `${item.street} ${item.name}, ${item.postalCode} ${item.city}`;
                                     
                                     setLocationInput(resultLocation);
                                 }
-                                
-                                
+                                // Luk modallen
                                 setModalOpen(false);
-                                console.log('loc ' + locationInput)
                             }} 
                         />
                     </View>

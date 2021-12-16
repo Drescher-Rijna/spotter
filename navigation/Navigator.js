@@ -22,15 +22,15 @@ export class Navigator extends Component {
     
     render() {
         return (
-            <Tab.Navigator initialRouteName="Home" >
-                <Tab.Screen name="Home" component={Home}
+            <Tab.Navigator initialRouteName="Hjem" >
+                <Tab.Screen name="Hjem" component={Home}
                     options={{
                         tabBarIcon: ({ color, size }) => (
                             <Ionicons name="home" color={color} size={26} />
                         )
                     }}
                 />
-                <Tab.Screen name="Create" component={Empty}
+                <Tab.Screen name="Indlæg" component={Empty}
                     listeners={({ navigation }) => ({
                         tabPress: event => {
                             event.preventDefault();
@@ -44,7 +44,7 @@ export class Navigator extends Component {
                     }}
                 
                 />
-                <Tab.Screen name="Profile" component={Profile}
+                <Tab.Screen name="Profil" component={Profile}
                     options={{
                         tabBarIcon: ({ color, size }) => (
                             <Ionicons name="person" color={color} size={26} />
