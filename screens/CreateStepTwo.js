@@ -171,7 +171,7 @@ export default function CreateStepTwo(props) {
                                     value={locationInput}
                                     editable={false}
                                 />
-                                <TouchableOpacity style={{backgroundColor: 'red', flex: 0.3}} onPress={() => {setModalOpen(!modalOpen)}}>
+                                <TouchableOpacity style={{backgroundColor: 'red', flex: 0.3}} onPress={() => {setModalOpen(true)}}>
                                     <Text style={{textAlign: 'center', fontWeight: 'bold', color: 'white', textAlignVertical: 'center'}} >New location</Text>
                                 </TouchableOpacity>
                             </View>
@@ -236,7 +236,7 @@ export default function CreateStepTwo(props) {
                     />
 
                     <View style={{zIndex: 3, flexDirection: 'row', justifyContent: 'space-between', marginHorizontal: 10, marginTop: 55, marginBottom: 10}}>
-                        <Button title="Back" onPress={() => setModalOpen(!modalOpen)} />
+                        <Button title="Back" onPress={() => setModalOpen(false)} />
                         {/* Make it so when they press the new coords are made to a address and make choosenLocation into that */}
                         <Button title="Confirm location" onPress={async() => {
                                 let result = await Location.reverseGeocodeAsync({latitude: coordinates.latitude, longitude: coordinates.longitude});
@@ -249,7 +249,7 @@ export default function CreateStepTwo(props) {
                                 }
                                 
                                 
-                                setModalOpen(!modalOpen);
+                                setModalOpen(false);
                                 console.log('loc ' + locationInput)
                             }} 
                         />
@@ -269,7 +269,7 @@ export default function CreateStepTwo(props) {
                             longitudeDelta: 0.0121, 
                             latitudeDelta: 0.0122
                         }}
-                        provider="google"
+                        key="AIzaSyC98flPHNxCKCi2Sq3oxKJ4kVdeApkwR3c"
                     >
                         <Marker coordinate={coordinates} />
                     </MapView>

@@ -24,7 +24,12 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
       },
-      "package": "com.gisito.spotter"
+      "package": "com.gisito.spotter",
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyC98flPHNxCKCi2Sq3oxKJ4kVdeApkwR3c"
+        }
+      }
     },
     "web": {
       "favicon": "./assets/favicon.png"

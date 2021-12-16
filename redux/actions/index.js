@@ -1,6 +1,6 @@
-import { collection, doc, getDoc, getDocs, onSnapshot, orderBy, query, where } from '@firebase/firestore'
+import { collection, doc, getDoc, getDocs, orderBy, query } from '@firebase/firestore'
 import { auth, firestore } from '../../Firebase'
-import { USER_STATE_CHANGE, POSTS_STATE_CHANGE ,USER_LIKES_STATE_CHANGE, CLEAR_DATA} from '../constants/index'
+import { USER_STATE_CHANGE, POSTS_STATE_CHANGE, CLEAR_DATA} from '../constants/index'
 
 export function clearData() {
     return ((dispatch) => {

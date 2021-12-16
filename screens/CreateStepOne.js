@@ -1,11 +1,9 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native';
-import { useState } from 'react/cjs/react.development'
 // Camera packages
 import { Camera } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
 import Slider from '@react-native-community/slider';
-import { FaceDetectorClassifications, FaceDetectorLandmarks, FaceDetectorMode } from 'expo-face-detector';
 
 export default function CreateStepOne({ navigation }) {
     // Camera and gallery states

@@ -1,11 +1,8 @@
-import { collection } from '@firebase/firestore';
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { ActivityIndicator, FlatList, ScrollView, StyleSheet, Text, View } from 'react-native'
 import DropDownPicker from 'react-native-dropdown-picker';
 import { SearchBar } from 'react-native-elements';
-import { useEffect, useState } from 'react/cjs/react.development';
 import SpotPreview from '../components/SpotPreview';
-import { firestore } from '../Firebase'
 import Fuse from 'fuse.js';
 import { connect } from 'react-redux'
 
@@ -15,7 +12,6 @@ function Home(props) {
 
     //Search field states
     const [searchTerm, setSearchTerm] = useState(null);
-    const [searchResults, setSearchResults] = useState([]);
 
     // filter state
     const [open, setOpen] = useState(false);
@@ -26,9 +22,9 @@ function Home(props) {
         {label: 'Hybrid', value: 'Hybrid'}
     ]);
     const [filterVal, setFilterVal] = useState("All");
-
     
     useEffect(async() => {
+        
         
         if (filterVal === 'Park' || filterVal === 'Street' || filterVal === 'Hybrid') {
 
@@ -48,7 +44,7 @@ function Home(props) {
 
         
 
-    }, [props.feed, filterVal, searchTerm, props.navigation])
+    }, [props.feed, filterVal, searchTerm])
 
     const renderLoader = () => {
         return (
