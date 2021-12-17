@@ -116,7 +116,7 @@ export default function CreateStepTwo(props) {
                                 await updateDoc(docRef, { id: document.id});
                             }).then(() => {
                                 setProgress(null);
-                                props.navigation.popToTop();
+                                props.navigation.navigate('Hjem');
                             });
                         } catch (e) {
                             console.log(e);
@@ -155,6 +155,7 @@ export default function CreateStepTwo(props) {
                             style={styles.textArea}
                             placeholder='Describe the spot...'
                             value={descriptionInput}
+                            multiline={true}
                             onChangeText={val => {setDescriptionInput(val); console.log(val);}}
                         />
 
